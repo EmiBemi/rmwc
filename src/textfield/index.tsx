@@ -60,6 +60,10 @@ export interface TextFieldProps extends RMWC.WithRippleProps {
   type?: string;
   /** Advanced: A reference to the MDCFoundation. */
   foundationRef?: React.Ref<MDCTextFieldFoundation | null>;
+  /** Displays a prefix in the Textfield. */
+  prefix?: string;
+  /** Displays a suffix in the Textfield. */
+  suffix?: string;
 }
 
 export type TextFieldHTMLProps = RMWC.HTMLProps<
@@ -95,6 +99,8 @@ export const TextField: RMWC.ComponentType<
     foundationRef,
     ripple,
     floatLabel: userFloatLabel,
+    prefix,
+    suffix,
     ...rest
   } = props;
 
@@ -127,7 +133,10 @@ export const TextField: RMWC.ComponentType<
       'mdc-text-field--with-leading-icon': !!icon,
       'mdc-text-field--with-trailing-icon': !!trailingIcon,
       'mdc-text-field--no-label': !label,
-      'mdc-text-field--end-aligned': align === 'end'
+      'mdc-text-field--end-aligned': align === 'end',
+      'mdc-text-field__affix': !!prefix || !!suffix,
+      'mdc-text-field__affix--prefix': !!prefix,
+      'mdc-text-field__affix--suffix': !!suffix
     }
   ]);
 
@@ -200,6 +209,11 @@ export const TextField: RMWC.ComponentType<
         {/** Render character counter in different place for textarea */}
         {!!textarea && renderedCharacterCounter}
         <TextFieldRipple />
+        {/* {!!prefix && (
+          <span className="mdc-text-field__affix mdc-text-field__affix--prefix">
+            {prefix}
+          </span>
+        )} */}
         <Tag
           {...rest}
           element={inputEl}
@@ -255,6 +269,34 @@ const TextFieldCharacterCount = React.memo(function TextFieldCharacterCount(
   const { content } = useTextFieldCharacterCountFoundation(props);
   return <div className="mdc-text-field-character-counter">{content}</div>;
 });
+
+/*********************************************************************
+ * Prefix
+ *********************************************************************/
+
+export interface TextFieldPrefixProps {
+  /** Make the help text always visible */
+  prefix?: boolean;
+  suffix?: boolean;
+  /** Content for the help text */
+  children: React.ReactNode;
+}
+
+/** A help text component */
+export const TextFieldPrefix = createComponent<TextFieldPrefixProps>(
+  function TextFieldPrefixText(props, ref) {
+    const { prefix, suffix, ...rest } = props;
+    const className = useClassNames(props, [
+      'mdc-text-field__affix',
+      {
+        'mdc-text-field__affix--prefix': prefix,
+        'mdc-text-field__affix--suffix': suffix
+      }
+    ]);
+
+    return <Tag tag="p" {...rest} className={className} ref={ref} />;
+  }
+);
 
 /*********************************************************************
  * Helper Text
